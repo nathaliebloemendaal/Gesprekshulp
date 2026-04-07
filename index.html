@@ -262,7 +262,7 @@ function stopMic(btn, isNL) {
 async function roepAPI(prompt) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }
+    'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
