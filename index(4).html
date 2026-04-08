@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gesprekshulp</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --gold-pale: #F5EDD6;
+    --blush: #FAF0F0;
+    --lavender: #EAE4F2;
+    --mint: #DFF0EA;
+    --peach: #FAEAE0;
+    --cream: #FDFAF4;
+    --text-dark: #3A2E2E;
+    --text-mid: #7A6B6B;
+    --text-light: #B09E9E;
+    --border: #E8D8C8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    color: var(--text-dark);
+    min-height: 100vh;
+    padding: 2rem 1rem 3rem;
+  }
+  .ornament { text-align: center; color: var(--gold); font-size: 20px; letter-spacing: 0.3em; margin-bottom: 0.25rem; }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-style: italic;
+    font-size: 2.2rem; color: var(--text-dark);
+    text-align: center; letter-spacing: 0.04em;
+    margin-bottom: 0.15rem; line-height: 1.2;
+  }
+  .title-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-size: 1.05rem;
+    color: var(--text-mid); text-align: center;
+    letter-spacing: 0.08em; margin-bottom: 0.15rem;
+  }
+  .subtitle {
+    text-align: center; font-size: 0.7rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 2.5rem;
+  }
+  .card {
+    max-width: 620px; margin: 0 auto 1.25rem;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 18px; padding: 1.75rem 2rem; position: relative;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%); width: 60px; height: 2px;
+    background: var(--gold); border-radius: 0 0 4px 4px;
+  }
+  .card-label {
+    font-size: 0.65rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 0.85rem; font-weight: 400;
+  }
+  textarea {
+    width: 100%; border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+    font-family: 'Jost', sans-serif; font-weight: 300;
+    font-size: 1rem; color: var(--text-dark);
+    background: var(--blush); resize: none; min-height: 70px;
+    transition: border-color 0.2s; outline: none;
+  }
+  textarea:focus { border-color: var(--gold); background: #fff; }
+  textarea::placeholder { color: var(--text-light); font-style: italic; }
+  .btn-row { display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; }
+  .btn {
+    flex: 1; min-width: 120px;
+    padding: 11px 8px; background: var(--gold-pale);
+    border: 1px solid var(--gold-light); border-radius: 50px;
+    font-family: 'Jost', sans-serif; font-size: 0.72rem;
+    font-weight: 400; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--text-dark);
+    cursor: pointer; transition: background 0.2s, border-color 0.2s;
+  }
+  .btn:hover { background: var(--gold-light); border-color: var(--gold); }
+  .btn:active { transform: scale(0.99); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn.mic-active { background: #F5E0E0; border-color: #D4A0A0; color: #8B4040; }
+  .mic-indicator {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; background: #C05050;
+    margin-right: 6px; animation: pulse 1s infinite;
+    vertical-align: middle;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .results-grid {
+    max-width: 620px; margin: 0 auto 1.5rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .result-area {
+    background: var(--lavender); border: 1px solid #D8D0EA;
+    border-radius: 14px; padding: 1.1rem 1.2rem; min-height: 90px;
+  }
+  .result-area.darija { background: var(--peach); border-color: #E8CEBC; }
+  .result-lang {
+    font-size: 0.6rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-light);
+    margin-bottom: 8px; font-weight: 400;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .speak-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--gold); font-size: 14px; padding: 2px 4px;
+    border-radius: 4px; opacity: 0.7; transition: opacity 0.2s;
+  }
+  .speak-btn:hover { opacity: 1; }
+  .result-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem; font-weight: 400;
+    line-height: 1.6; color: var(--text-dark); word-break: break-word;
+  }
+  .result-text.arabic { direction: rtl; text-align: right; }
+  .placeholder-txt { font-size: 0.85rem; color: var(--text-light); font-style: italic; font-family: 'Jost', sans-serif; }
+  .divider {
+    display: flex; align-items: center; gap: 1rem;
+    max-width: 620px; margin: 0 auto 1.25rem;
+    color: var(--gold-light); font-size: 1rem; letter-spacing: 0.3em;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .nl-result {
+    margin-top: 1rem; background: var(--mint);
+    border: 1px solid #C0DDD4; border-radius: 12px;
+    padding: 1.1rem 1.2rem; min-height: 70px;
+    font-family: 'Jost', sans-serif; font-size: 1rem;
+    font-weight: 300; color: var(--text-dark); line-height: 1.6;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .nl-result-text { flex: 1; }
+  .error { font-size: 0.8rem; color: #b05050; margin-top: 8px; font-style: italic; }
+  .loading { font-size: 0.8rem; color: var(--text-light); margin-top: 8px; font-style: italic; }
+  .tip {
+    max-width: 620px; margin: 0 auto; text-align: center;
+    font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-light); padding-top: 0.5rem;
+  }
+  .no-speech { display: none; background: #FFF3CD; border: 1px solid #E8D8A0; border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #7A6020; margin-bottom: 1rem; max-width: 620px; margin-left: auto; margin-right: auto; }
+  @media (max-width: 480px) {
+    .results-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ornament">— ✦ —</div>
+<h1>Gesprekshulp</h1>
+<p class="title-sub">Tallalt n Tamsawalt &nbsp;·&nbsp; مساعدة في المحادثة</p>
+<p class="subtitle">Nederlands &nbsp;·&nbsp; Tamazight &nbsp;·&nbsp; Darija</p>
+
+<div class="no-speech" id="no-speech-msg">
+  Spraakherkenning wordt niet ondersteund in deze browser. Gebruik Chrome of Safari voor de microfoon.
+</div>
+
+<div class="card">
+  <div class="card-label">Jouw bericht — Nederlands</div>
+  <textarea id="nl-input" placeholder="Typ hier, of gebruik de microfoon…" rows="3"></textarea>
+  <div class="btn-row">
+    <button class="btn" id="btn-mic-nl" onclick="startSpeech('nl')">🎙 Inspreken</button>
+    <button class="btn" id="btn-tmz" onclick="vertaalNaar('tmz')">→ Tamazight</button>
+    <button class="btn" id="btn-dar" onclick="vertaalNaar('dar')">→ Darija</button>
+    <button class="btn" id="btn-both" onclick="vertaalBeiden()">→ Beide</button>
+  </div>
+  <div id="load-nl" class="loading" style="display:none">Bezig met vertalen…</div>
+  <div id="err-nl" class="error"></div>
+</div>
+
+<div class="results-grid">
+  <div class="result-area">
+    <div class="result-lang">
+      Tamazight
+      <button class="speak-btn" onclick="spreekUit('tmz')" title="Voorlezen">▶</button>
+    </div>
+    <div class="result-text" id="res-text-tmz"><span class="placeholder-txt">Vertaling verschijnt hier…</span></div>
+  </div>
+  <div class="result-area darija">
+    <div class="result-lang">
+      Darija
+      <button class="speak-btn" onclick="spreekUit('dar')" title="Voorlezen">▶</button>
+    </div>
+    <div class="result-text arabic" id="res-text-dar"><span class="placeholder-txt" style="direction:ltr">الترجمة ستظهر هنا…</span></div>
+  </div>
+</div>
+
+<div class="divider">✦</div>
+
+<div class="card">
+  <div class="card-label">Cliënt — Arabisch / Darija inspreken</div>
+  <textarea id="rev-input" placeholder="Of type hier in Arabisch schrift of Latijns…" rows="3"></textarea>
+  <div class="btn-row">
+    <button class="btn" id="btn-mic-ar" onclick="startSpeech('ar')">🎙 Inspreken (Arabisch)</button>
+    <button class="btn" id="btn-rev" onclick="vertaalNaarNL()">→ Nederlands</button>
+  </div>
+  <div id="load-rev" class="loading" style="display:none">Bezig met vertalen…</div>
+  <div id="err-rev" class="error"></div>
+  <div class="nl-result">
+    <div class="nl-result-text" id="res-nl"><span style="color: var(--text-light); font-style: italic; font-size: 0.85rem;">Jouw Nederlandse vertaling verschijnt hier…</span></div>
+    <button class="speak-btn" onclick="spreekUitNL()" title="Voorlezen" style="flex-shrink:0">▶</button>
+  </div>
+</div>
+
+<p class="tip">🎙 inspreekknop → automatisch vertalen &nbsp;·&nbsp; ▶ knop leest voor &nbsp;·&nbsp; Geen persoonsgegevens invoeren</p>
+
+<script>
+const APIKEY = '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';
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let herkenning = null;
+let activeMic = null;
+
+if (!SpeechRecognition) {
+  document.getElementById('no-speech-msg').style.display = 'block';
+  document.getElementById('btn-mic-nl').disabled = true;
+  document.getElementById('btn-mic-ar').disabled = true;
+}
+
+function startSpeech(taal) {
+  if (!SpeechRecognition) return;
+  if (activeMic) { activeMic.stop(); return; }
+  const isNL = taal === 'nl';
+  const btnId = isNL ? 'btn-mic-nl' : 'btn-mic-ar';
+  const inputId = isNL ? 'nl-input' : 'rev-input';
+  const btn = document.getElementById(btnId);
+  herkenning = new SpeechRecognition();
+  herkenning.lang = isNL ? 'nl-NL' : 'ar-MA';
+  herkenning.interimResults = false;
+  herkenning.maxAlternatives = 1;
+  activeMic = herkenning;
+  btn.innerHTML = '<span class="mic-indicator"></span>Luisteren…';
+  btn.classList.add('mic-active');
+  herkenning.onresult = (e) => {
+    const tekst = e.results[0][0].transcript;
+    document.getElementById(inputId).value = tekst;
+    stopMic(btn, isNL);
+    if (isNL) vertaalBeiden();
+    else vertaalNaarNL();
+  };
+  herkenning.onerror = () => stopMic(btn, isNL);
+  herkenning.onend = () => stopMic(btn, isNL);
+  herkenning.start();
+}
+
+function stopMic(btn, isNL) {
+  activeMic = null;
+  herkenning = null;
+  btn.innerHTML = isNL ? '🎙 Inspreken' : '🎙 Inspreken (Arabisch)';
+  btn.classList.remove('mic-active');
+}
+
+async function roepAPI(prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': APIKEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  return data.content?.find(b => b.type === 'text')?.text?.trim() || null;
+}
+
+function setBtns(ids, disabled) {
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = disabled; });
+}
+
+async function vertaalNaar(taal) {
+  const tekst = document.getElementById('nl-input').value.trim();
+  if (!tekst) return;
+  document.getElementById('err-nl').textContent = '';
+  document.getElementById('load-nl').style.display = 'block';
+  setBtns(['btn-tmz','btn-dar','btn-both','btn-mic-nl'], true);
+  const isTmz = taal === 'tmz';
+  const prompt = isTmz
+    ? `Vertaal naar Central Atlas Tamazight (Latijns schrift). Alleen de vertaling, geen uitleg.\n\nTekst: ${tekst}`
+    : `Vertaal naar Marokkaans Arabisch (Darija), schrijf in Arabisch schrift. Alleen de vertaling, geen uitleg.\n\nTekst: ${tekst}`;
+  try {
+    const v = await roepAPI(prompt);
+    document.getElementById('load-nl').style.display = 'none';
+    if (v) {
+      const el = document.getElementById(isTmz ? 'res-text-tmz' : 'res-text-dar');
+      el.innerHTML = '';
+      el.textContent = v;
+    } else {
+      document.getElementById('err-nl').textContent = 'Geen vertaling ontvangen.';
+    }
+  } catch {
+    document.getElementById('load-nl').style.display = 'none';
+    document.getElementById('err-nl').textContent = 'Verbindingsfout.';
+  } finally {
+    setBtns(['btn-tmz','btn-dar','btn-both','btn-mic-nl'], false);
+  }
+}
+
+async function vertaalBeiden() {
+  const tekst = document.getElementById('nl-input').value.trim();
+  if (!tekst) return;
+  document.getElementById('err-nl').textContent = '';
+  document.getElementById('load-nl').style.display = 'block';
+  setBtns(['btn-tmz','btn-dar','btn-both','btn-mic-nl'], true);
+  try {
+    const [tmz, dar] = await Promise.all([
+      roepAPI(`Vertaal naar Central Atlas Tamazight (Latijns schrift). Alleen de vertaling, geen uitleg.\n\nTekst: ${tekst}`),
+      roepAPI(`Vertaal naar Marokkaans Arabisch (Darija), schrijf in Arabisch schrift. Alleen de vertaling, geen uitleg.\n\nTekst: ${tekst}`)
+    ]);
+    document.getElementById('load-nl').style.display = 'none';
+    if (tmz) { const el = document.getElementById('res-text-tmz'); el.innerHTML = ''; el.textContent = tmz; }
+    if (dar) { const el = document.getElementById('res-text-dar'); el.innerHTML = ''; el.textContent = dar; }
+    if (dar) setTimeout(() => spreekUit('dar'), 300);
+  } catch {
+    document.getElementById('load-nl').style.display = 'none';
+    document.getElementById('err-nl').textContent = 'Verbindingsfout.';
+  } finally {
+    setBtns(['btn-tmz','btn-dar','btn-both','btn-mic-nl'], false);
+  }
+}
+
+async function vertaalNaarNL() {
+  const tekst = document.getElementById('rev-input').value.trim();
+  if (!tekst) return;
+  document.getElementById('err-rev').textContent = '';
+  document.getElementById('load-rev').style.display = 'block';
+  setBtns(['btn-rev','btn-mic-ar'], true);
+  try {
+    const v = await roepAPI(`Vertaal de volgende tekst (Marokkaans Arabisch, Darija of Tamazight) naar het Nederlands. Alleen de vertaling, geen uitleg.\n\nTekst: ${tekst}`);
+    document.getElementById('load-rev').style.display = 'none';
+    if (v) {
+      const el = document.getElementById('res-nl');
+      el.innerHTML = '';
+      el.textContent = v;
+      setTimeout(() => spreekUitNL(), 300);
+    } else {
+      document.getElementById('err-rev').textContent = 'Geen vertaling ontvangen.';
+    }
+  } catch {
+    document.getElementById('load-rev').style.display = 'none';
+    document.getElementById('err-rev').textContent = 'Verbindingsfout.';
+  } finally {
+    setBtns(['btn-rev','btn-mic-ar'], false);
+  }
+}
+
+function spreekUit(taal) {
+  const tekst = document.getElementById(taal === 'tmz' ? 'res-text-tmz' : 'res-text-dar').textContent.trim();
+  if (!tekst || tekst.includes('verschijnt hier') || tekst.includes('ستظهر')) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(tekst);
+  utt.lang = taal === 'tmz' ? 'fr-MA' : 'ar-MA';
+  utt.rate = 0.9;
+  window.speechSynthesis.speak(utt);
+}
+
+function spreekUitNL() {
+  const tekst = document.getElementById('res-nl').textContent.trim();
+  if (!tekst || tekst.includes('verschijnt hier')) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(tekst);
+  utt.lang = 'nl-NL';
+  utt.rate = 0.9;
+  window.speechSynthesis.speak(utt);
+}
+
+document.getElementById('nl-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) vertaalBeiden();
+});
+document.getElementById('rev-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) vertaalNaarNL();
+});
+</script>
+</body>
+</html>
